@@ -1,0 +1,23 @@
+version: '3.7'
+services:
+  xyz-loader:
+    network_mode: "host"
+    image: busybox
+    volumes:
+      - type: volume
+        source: netboot.xyz
+        target: /data
+    command: ["wget", "-P", "/data", "https://boot.netboot.xyz/ipxe/netboot.xyz.efi"]
+  pixiecore:
+    network_mode: "host"
+    build: .
+    depends_on:
+      - "xyz-loader"
+    volumes:
+      - type: volume
+        source: netboot.xyz
+        target: /data
+    command: ["quick", "xyz", "--dhcp-no-bind", "-p", "81", "--ipxe-efi64", "/data/netboot.xyz.efi", "-d"]
+
+volumes:
+  netboot.xyz:
